@@ -1,9 +1,9 @@
 package com.bignerdranch.android.geoquiz;
 
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -63,6 +63,7 @@ public class QuizActivity extends AppCompatActivity {
         });
 
         mNextButton = (Button) findViewById(R.id.next_button);
+        mNextButton.setEnabled(false);  //TODO: bad design of enabling/disabling button, need to revisit
         mNextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -70,6 +71,7 @@ public class QuizActivity extends AppCompatActivity {
                 updateQuestion();
 
                 enableTrueFalseButton();
+                mNextButton.setEnabled(false);
             }
         });
 
@@ -88,21 +90,47 @@ public class QuizActivity extends AppCompatActivity {
 
         if(userPressedTrue == answerIsTrue) {
             messageResId = R.string.correct_toast;
+            mQuestionBank[mCurrentIndex].setUserAnswerCorrect(true);
         } else {
             messageResId = R.string.incorrect_toast;
+            mQuestionBank[mCurrentIndex].setUserAnswerCorrect(false);
         }
 
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show();
+
+        if(mCurrentIndex == (mQuestionBank.length - 1)) {
+            gradeUserScore();
+        }
     }
 
     private void disableTrueFalseButton() {
         mTrueButton.setEnabled(false);
         mFalseButton.setEnabled(false);
+        mNextButton.setEnabled(true);
     }
 
     private void enableTrueFalseButton() {
         mTrueButton.setEnabled(true);
         mFalseButton.setEnabled(true);
+        mNextButton.setEnabled(true);
+    }
+
+    private void gradeUserScore()
+    {
+        int totalGrade = 0;
+
+        for(Question answer : mQuestionBank) {
+            if(answer.isUserAnswerCorrect() == true)
+                totalGrade++;
+        }
+
+        totalGrade = (int) ((totalGrade * 100.0f) / mQuestionBank.length);
+
+        CharSequence output = "You scored " + totalGrade + "%";
+
+        Toast toast = Toast.makeText(this, output, Toast.LENGTH_LONG);
+        toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 0);
+        toast.show();
     }
 
     @Override
