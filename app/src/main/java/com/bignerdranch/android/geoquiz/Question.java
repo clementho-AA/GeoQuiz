@@ -4,7 +4,6 @@ public class Question {
     private int mTextResId;
     private boolean mAnswerTrue;
     private boolean mUserAnswerCorrect = false;
-    private int test;
 
     public Question(int textResId, boolean answerTrue) {
         mTextResId = textResId;
