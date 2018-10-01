@@ -10,6 +10,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.w3c.dom.Text;
+
 public class QuizActivity extends AppCompatActivity {
 
     private Button mTrueButton;
@@ -33,6 +35,9 @@ public class QuizActivity extends AppCompatActivity {
     private static final String TAG = "QuizActivity";
     private static final String KEY_INDEX = "index";
     private static final int REQUEST_CODE_CHEAT = 0;
+
+    private TextView mCheatTokensTextView;
+    private int mCheatTokens = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +91,9 @@ public class QuizActivity extends AppCompatActivity {
             }
         });
 
+        mCheatTokensTextView = (TextView) findViewById(R.id.cheat_tokens);
+        mCheatTokensTextView.setText(mCheatTokens + " cheat tokens left.");
+
         updateQuestion();
     }
 
@@ -101,12 +109,17 @@ public class QuizActivity extends AppCompatActivity {
             }
 
             mIsCheater = CheatActivity.wasAnswerShown(data);
+            mCheatTokens--;
+            updateQuestion();
         }
     }
 
     private void updateQuestion() {
         int question = mQuestionBank[mCurrentIndex].getTextResId();
         mQuestionTextView.setText(question);
+
+        mCheatTokensTextView.setText(mCheatTokens + " cheat tokens left.");
+        mCheatButton.setEnabled(!mIsCheater && (mCheatTokens > 0));
     }
 
     private void checkAnswer(boolean userPressedTrue) {
